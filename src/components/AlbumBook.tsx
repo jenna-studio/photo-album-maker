@@ -39,9 +39,8 @@ const AlbumBook: React.FC<AlbumBookProps> = ({
   const leftPage = isMobile ? pages[currentPageIndex] : pages[currentPageIndex * 2];
   const rightPage = isMobile ? null : pages[currentPageIndex * 2 + 1];
   
-  // Get all favorites and videos for export
+  // Get all favorites for export
   const allFavorites = album.photos.filter(photo => photo.isFavorite);
-  const allVideos = album.photos.filter(photo => photo.type === 'video');
 
   const handlePageTurn = useCallback((direction: 'next' | 'prev') => {
     if (isAnimating) return;
@@ -218,7 +217,6 @@ const AlbumBook: React.FC<AlbumBookProps> = ({
                   onClick={() => setSelectedPhoto(photo)}
                   onUpdate={(updates) => onPhotoUpdate(photo.id, updates)}
                   size="medium"
-                  isVideoSquare={false}
                 />
               ))}
             </div>

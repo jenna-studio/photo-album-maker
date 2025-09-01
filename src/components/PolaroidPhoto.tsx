@@ -6,15 +6,13 @@ interface PolaroidPhotoProps {
   onClick: () => void;
   onUpdate: (updates: Partial<Photo>) => void;
   size?: 'small' | 'medium' | 'large';
-  isVideoSquare?: boolean;
 }
 
 const PolaroidPhoto: React.FC<PolaroidPhotoProps> = ({
   photo,
   onClick,
   onUpdate,
-  size = 'medium',
-  isVideoSquare = false
+  size = 'medium'
 }) => {
   const [dimensions, setDimensions] = useState({ width: 250, height: 250 });
   const [gridRowSpan, setGridRowSpan] = useState(25); // Default span for masonry

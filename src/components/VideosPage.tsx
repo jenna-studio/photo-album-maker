@@ -15,10 +15,15 @@ const VideosPage: React.FC<VideosPageProps> = ({
   onPhotoClick,
   onPhotoUpdate
 }) => {
+  const videoCount = page.photos.length;
+  
   return (
     <div className="videos-page">
-      {page.photos.length > 0 ? (
-        <div className="photos-grid videos-grid">
+      {videoCount > 0 ? (
+        <div 
+          className="videos-grid" 
+          data-count={Math.min(videoCount, 3)}
+        >
           {page.photos.map((photo) => (
             <PolaroidPhoto
               key={photo.id}
@@ -26,7 +31,6 @@ const VideosPage: React.FC<VideosPageProps> = ({
               onClick={() => onPhotoClick(photo)}
               onUpdate={(updates) => onPhotoUpdate(photo.id, updates)}
               size="medium"
-              isVideoSquare={true}
             />
           ))}
         </div>
