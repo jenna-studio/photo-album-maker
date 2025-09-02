@@ -187,10 +187,6 @@ export const createHTMLTemplate = (
                                 <div class="detail-display">\${selectedPhoto.location || 'No location available'}</div>
                             </div>
                             
-                            <div class="detail-group">
-                                <label>Description</label>
-                                <div class="detail-display">\${selectedPhoto.description || 'No description available'}</div>
-                            </div>
                             
                             <div class="metadata">
                                 <div class="metadata-item">
@@ -345,9 +341,7 @@ export const createHTMLTemplate = (
                         </div>
                         <div class="polaroid-caption">
                             <div class="caption-content">
-                                \${photo.location ? \`<div class="location-text">\${photo.location}</div>\` : ''}
-                                \${photo.description ? \`<div class="description-text">\${photo.description}</div>\` : ''}
-                                \${!photo.location && !photo.description ? '<div class="empty-caption">Click to add caption</div>' : ''}
+                                <div class="empty-caption">✨ Favorite Memory</div>
                             </div>
                         </div>
                     </div>

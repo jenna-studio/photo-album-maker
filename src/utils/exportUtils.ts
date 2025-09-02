@@ -9,33 +9,14 @@ const BOOK_PAGE_WIDTH = 800;    // Single page width
 const BOOK_PAGE_HEIGHT = 600;   // Page height
 const PHOTOS_PER_SPREAD = 6;    // 3 photos per page, 2 pages per spread
 
-const calculateCaptionHeight = (photo: Photo, maxWidth: number): number => {
-  // Calculate height needed for caption based on content
-  const hasLocation = !!photo.location;
-  const hasDescription = !!photo.description;
-  
-  if (!hasLocation && !hasDescription) {
-    return 25; // Default height for "✨ Favorite Memory"
-  }
-
-  let estimatedLines = 0;
-  const charPerLine = Math.floor(maxWidth / 8); // Rough estimate based on font size
-
-  if (hasLocation) {
-    estimatedLines += Math.ceil((photo.location?.length || 0 + 2) / charPerLine); // +2 for icon
-  }
-  
-  if (hasDescription) {
-    estimatedLines += Math.ceil((photo.description?.length || 0) / charPerLine);
-  }
-
-  // Add some padding between lines and ensure minimum height
-  return Math.max(25, estimatedLines * 16 + 10);
+const calculateCaptionHeight = (): number => {
+  // Fixed height for clean polaroid look without descriptions
+  return 25;
 };
 
 const createStyledPolaroid = async (photo: Photo, maxWidth: number = 220): Promise<HTMLElement> => {
-  // Calculate dynamic caption height
-  const captionHeight = calculateCaptionHeight(photo, maxWidth);
+  // Get fixed caption height
+  const captionHeight = calculateCaptionHeight();
 
   // Create polaroid container with album styling
   const polaroidContainer = document.createElement('div');
@@ -129,16 +110,8 @@ const createStyledPolaroid = async (photo: Photo, maxWidth: number = 220): Promi
     line-height: 1.3;
   `;
 
-  let captionHTML = '';
-  if (photo.location) {
-    captionHTML += `<div style="font-weight: bold; margin-bottom: 2px;">📍 ${photo.location}</div>`;
-  }
-  if (photo.description) {
-    captionHTML += `<div style="font-style: italic;">${photo.description}</div>`;
-  }
-  if (!photo.location && !photo.description) {
-    captionHTML = '<div>✨ Favorite Memory</div>';
-  }
+  // No descriptions in exports - clean polaroid look
+  const captionHTML = '<div>✨ Favorite Memory</div>';
 
   captionContent.innerHTML = captionHTML;
   caption.appendChild(captionContent);
