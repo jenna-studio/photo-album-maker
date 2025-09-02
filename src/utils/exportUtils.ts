@@ -70,18 +70,7 @@ const createStyledPolaroid = async (photo: Photo): Promise<HTMLElement> => {
   photoContainer.appendChild(img);
   frame.appendChild(photoContainer);
 
-  // Create minimal caption space like original album (no text)
-  const caption = document.createElement('div');
-  caption.className = 'polaroid-caption';
-  caption.style.cssText = `
-    margin-top: 10px;
-    height: 25px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  `;
-
-  frame.appendChild(caption);
+  // No caption space - completely clean polaroid like original album
   polaroidContainer.appendChild(frame);
 
   return polaroidContainer;

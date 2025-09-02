@@ -341,7 +341,6 @@ export const createHTMLTemplate = (
                         </div>
                         <div class="polaroid-caption">
                             <div class="caption-content">
-                                <div class="empty-caption">✨ Favorite Memory</div>
                             </div>
                         </div>
                     </div>
