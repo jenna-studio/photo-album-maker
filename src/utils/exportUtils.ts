@@ -3,46 +3,36 @@ import { jsPDF } from 'jspdf';
 import JSZip from 'jszip';
 import type { Photo } from '../types';
 
-// Landscape book dimensions (like A4 landscape but wider for book spread)
+// Book dimensions matching original album layout
 const BOOK_SPREAD_WIDTH = 1600; // Full spread width (matches album)
 const BOOK_PAGE_WIDTH = 800;    // Single page width 
 const BOOK_PAGE_HEIGHT = 600;   // Page height
-const PHOTOS_PER_SPREAD = 6;    // 3 photos per page, 2 pages per spread
+const PHOTOS_PER_SPREAD = 8;    // 4 photos per page, 2 pages per spread
 
-const calculateCaptionHeight = (): number => {
-  // Fixed height for clean polaroid look without descriptions
-  return 25;
-};
-
-const createStyledPolaroid = async (photo: Photo, maxWidth: number = 220): Promise<HTMLElement> => {
-  // Get fixed caption height
-  const captionHeight = calculateCaptionHeight();
-
-  // Create polaroid container with album styling
+const createStyledPolaroid = async (photo: Photo): Promise<HTMLElement> => {
+  // Create polaroid container matching original album styling
   const polaroidContainer = document.createElement('div');
   polaroidContainer.className = 'polaroid-photo medium';
   polaroidContainer.style.cssText = `
     position: relative;
     cursor: default;
-    margin: 0.5rem;
+    margin: 0.25rem;
     width: fit-content;
-    max-width: ${maxWidth}px;
     box-sizing: border-box;
-    transform: rotate(${(Math.random() - 0.5) * 6}deg);
+    transform: rotate(${(Math.random() - 0.5) * 8}deg);
   `;
 
-  // Create polaroid frame with dynamic height
+  // Create polaroid frame exactly like original album
   const frame = document.createElement('div');
   frame.className = 'polaroid-frame';
   frame.style.cssText = `
     background: white;
-    padding: 12px 12px ${captionHeight + 12}px 12px;
+    padding: 12px;
     border: none;
     border-radius: 8px;
     box-shadow: 0 4px 15px rgba(135, 206, 235, 0.2);
     position: relative;
     width: fit-content;
-    max-width: ${maxWidth}px;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -55,7 +45,6 @@ const createStyledPolaroid = async (photo: Photo, maxWidth: number = 220): Promi
     position: relative;
     overflow: hidden;
     border-radius: 1px;
-    width: 100%;
   `;
 
   // Create image element
@@ -64,7 +53,7 @@ const createStyledPolaroid = async (photo: Photo, maxWidth: number = 220): Promi
   img.className = 'photo-image';
   img.style.cssText = `
     width: 100%;
-    height: 160px;
+    height: 200px;
     object-fit: cover;
     display: block;
     background: #f8f8f8;
@@ -81,40 +70,17 @@ const createStyledPolaroid = async (photo: Photo, maxWidth: number = 220): Promi
   photoContainer.appendChild(img);
   frame.appendChild(photoContainer);
 
-  // Create caption with location and description
+  // Create minimal caption space like original album (no text)
   const caption = document.createElement('div');
   caption.className = 'polaroid-caption';
   caption.style.cssText = `
-    position: absolute;
-    bottom: 12px;
-    left: 12px;
-    right: 12px;
-    height: ${captionHeight}px;
+    margin-top: 10px;
+    height: 25px;
     display: flex;
-    flex-direction: column;
     align-items: center;
     justify-content: center;
-    overflow: hidden;
   `;
 
-  const captionContent = document.createElement('div');
-  captionContent.className = 'caption-content';
-  captionContent.style.cssText = `
-    text-align: center;
-    font-family: "Courier New", monospace;
-    font-size: 0.75rem;
-    color: #333;
-    width: 100%;
-    word-wrap: break-word;
-    overflow-wrap: break-word;
-    line-height: 1.3;
-  `;
-
-  // No descriptions in exports - clean polaroid look
-  const captionHTML = '<div>✨ Favorite Memory</div>';
-
-  captionContent.innerHTML = captionHTML;
-  caption.appendChild(captionContent);
   frame.appendChild(caption);
   polaroidContainer.appendChild(frame);
 
@@ -208,18 +174,22 @@ const createBookSpread = async (leftPhotos: Photo[], rightPhotos: Photo[], sprea
     leftPage.appendChild(header);
   }
 
-  // Create photo grids for both pages
+  // Create photo grids for both pages (2x2 grid like original album)
   const createPhotoGrid = () => {
     const grid = document.createElement('div');
+    grid.className = 'photos-grid masonry-grid';
     grid.style.cssText = `
-      display: flex;
-      flex-direction: column;
+      display: grid;
       gap: 1rem;
-      justify-content: center;
+      justify-items: center;
       align-items: center;
+      grid-template-columns: repeat(2, 1fr);
+      grid-template-rows: repeat(2, 1fr);
+      justify-content: space-evenly;
+      align-content: center;
       flex: 1;
       width: 100%;
-      padding: 0.5rem;
+      padding: 1rem;
     `;
 
     return grid;
@@ -228,15 +198,15 @@ const createBookSpread = async (leftPhotos: Photo[], rightPhotos: Photo[], sprea
   const leftGrid = createPhotoGrid();
   const rightGrid = createPhotoGrid();
 
-  // Add photos to left page (max 3)
-  for (let i = 0; i < Math.min(leftPhotos.length, 3); i++) {
-    const polaroidElement = await createStyledPolaroid(leftPhotos[i], 200);
+  // Add photos to left page (max 4 in 2x2 grid)
+  for (let i = 0; i < Math.min(leftPhotos.length, 4); i++) {
+    const polaroidElement = await createStyledPolaroid(leftPhotos[i]);
     leftGrid.appendChild(polaroidElement);
   }
 
-  // Add photos to right page (max 3)  
-  for (let i = 0; i < Math.min(rightPhotos.length, 3); i++) {
-    const polaroidElement = await createStyledPolaroid(rightPhotos[i], 200);
+  // Add photos to right page (max 4 in 2x2 grid)  
+  for (let i = 0; i < Math.min(rightPhotos.length, 4); i++) {
+    const polaroidElement = await createStyledPolaroid(rightPhotos[i]);
     rightGrid.appendChild(polaroidElement);
   }
 
@@ -263,11 +233,11 @@ export const exportFavoritesToPDF = async (favorites: Photo[], albumName: string
     const pdf = new jsPDF('landscape', 'pt', [BOOK_SPREAD_WIDTH, BOOK_PAGE_HEIGHT]);
     let isFirstSpread = true;
 
-    // Process photos in groups of 6 (3 per page, 2 pages per spread)
+    // Process photos in groups of 8 (4 per page, 2 pages per spread)
     for (let i = 0; i < favorites.length; i += PHOTOS_PER_SPREAD) {
       const spreadPhotos = favorites.slice(i, i + PHOTOS_PER_SPREAD);
-      const leftPhotos = spreadPhotos.slice(0, 3);
-      const rightPhotos = spreadPhotos.slice(3, 6);
+      const leftPhotos = spreadPhotos.slice(0, 4);
+      const rightPhotos = spreadPhotos.slice(4, 8);
       
       const spreadTitle = isFirstSpread ? `${albumName || 'Album'} - Favorites` : '';
 
@@ -339,11 +309,11 @@ export const exportFavoritesToJPEG = async (favorites: Photo[], albumName: strin
     const zip = new JSZip();
     let spreadNumber = 1;
 
-    // Process photos in groups of 6 (3 per page, 2 pages per spread)
+    // Process photos in groups of 8 (4 per page, 2 pages per spread)
     for (let i = 0; i < favorites.length; i += PHOTOS_PER_SPREAD) {
       const spreadPhotos = favorites.slice(i, i + PHOTOS_PER_SPREAD);
-      const leftPhotos = spreadPhotos.slice(0, 3);
-      const rightPhotos = spreadPhotos.slice(3, 6);
+      const leftPhotos = spreadPhotos.slice(0, 4);
+      const rightPhotos = spreadPhotos.slice(4, 8);
       
       const spreadTitle = spreadNumber === 1 ? `${albumName || 'Album'} - Favorites` : '';
 
