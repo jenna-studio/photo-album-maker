@@ -79,32 +79,6 @@ export const createAlbumPages = (photos: MediaItem[]): AlbumPage[] => {
       }
     });
 
-  // Add favorites section at the end if there are any favorites (duplicated from original sections)
-  if (favoritePhotos.length > 0) {
-    // Add favorites index page
-    pages.push({
-      id: `favorites-index`,
-      dateHeader: 'Favorites',
-      photos: [],
-      pageNumber,
-      isIndexPage: true
-    });
-    pageNumber++;
-    
-    const photosPerPage = getPhotosPerPage();
-    for (let i = 0; i < favoritePhotos.length; i += photosPerPage) {
-      const pagePhotos = favoritePhotos.slice(i, i + photosPerPage);
-      
-      pages.push({
-        id: `favorites-${Math.ceil((i + 1) / photosPerPage)}`,
-        dateHeader: '',
-        photos: pagePhotos,
-        pageNumber
-      });
-      pageNumber++;
-    }
-  }
-
   // Add videos section if there are any videos
   if (videoItems.length > 0) {
     // Add videos index page
@@ -132,6 +106,32 @@ export const createAlbumPages = (photos: MediaItem[]): AlbumPage[] => {
         id: `videos-${Math.ceil((i + 1) / videosPerPage)}`,
         dateHeader: '',
         photos: pageVideos,
+        pageNumber
+      });
+      pageNumber++;
+    }
+  }
+
+  // Add favorites section at the end if there are any favorites (duplicated from original sections)
+  if (favoritePhotos.length > 0) {
+    // Add favorites index page
+    pages.push({
+      id: `favorites-index`,
+      dateHeader: 'Favorites',
+      photos: [],
+      pageNumber,
+      isIndexPage: true
+    });
+    pageNumber++;
+    
+    const photosPerPage = getPhotosPerPage();
+    for (let i = 0; i < favoritePhotos.length; i += photosPerPage) {
+      const pagePhotos = favoritePhotos.slice(i, i + photosPerPage);
+      
+      pages.push({
+        id: `favorites-${Math.ceil((i + 1) / photosPerPage)}`,
+        dateHeader: '',
+        photos: pagePhotos,
         pageNumber
       });
       pageNumber++;

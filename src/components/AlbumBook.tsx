@@ -3,6 +3,7 @@ import type { Album, AlbumPage, Photo } from '../types';
 import PolaroidPhoto from './PolaroidPhoto';
 import PhotoModal from './PhotoModal';
 import FavoritesPage from './FavoritesPage';
+import { exportAlbumToHTML } from '../utils/htmlExportUtils';
 
 interface AlbumBookProps {
   album: Album;
@@ -41,6 +42,16 @@ const AlbumBook: React.FC<AlbumBookProps> = ({
   
   // Get all favorites for export
   const allFavorites = album.photos.filter(photo => photo.isFavorite);
+
+  // Handle HTML export
+  const handleHTMLExport = async () => {
+    try {
+      await exportAlbumToHTML(album, pages);
+    } catch (error) {
+      console.error('Export failed:', error);
+      alert('Failed to export album. Please try again.');
+    }
+  };
 
   const handlePageTurn = useCallback((direction: 'next' | 'prev') => {
     if (isAnimating) return;
@@ -249,15 +260,22 @@ const AlbumBook: React.FC<AlbumBookProps> = ({
   return (
     <div className="album-book">
       <header className="album-header">
-        <button className="back-button" onClick={onBackToLanding}>
-          ← Back to Album
-        </button>
+        <div className="header-left">
+          <button className="back-button" onClick={onBackToLanding}>
+            ← Back to Album
+          </button>
+        </div>
         <h1 className="album-title">{album.name}</h1>
-        <div className="page-indicator">
-          {isMobile 
-            ? `Page ${currentPageIndex + 1} of ${pages.length}`
-            : `Page ${currentPageIndex * 2 + 1}-${Math.min(currentPageIndex * 2 + 2, pages.length)} of ${pages.length}`
-          }
+        <div className="header-right">
+          <button className="export-button export-html" onClick={handleHTMLExport} title="Export as offline HTML file">
+            📄 Export HTML
+          </button>
+          <div className="page-indicator">
+            {isMobile 
+              ? `Page ${currentPageIndex + 1} of ${pages.length}`
+              : `Page ${currentPageIndex * 2 + 1}-${Math.min(currentPageIndex * 2 + 2, pages.length)} of ${pages.length}`
+            }
+          </div>
         </div>
       </header>
 

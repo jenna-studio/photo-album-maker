@@ -13,7 +13,7 @@ body {
     height: 100%;
     overflow-x: hidden;
     font-family: "Inter", sans-serif;
-    background: linear-gradient(135deg, #ff6b9d 0%, #87ceeb 50%, #ffd700 100%);
+    background: linear-gradient(135deg, #f0f8ff 0%, #e6f3ff 100%);
     color: #2c3e50;
 }
 
@@ -219,7 +219,7 @@ body {
 .album-book {
     height: 100vh;
     overflow: hidden;
-    background: linear-gradient(135deg, #ff6b9d 0%, #87ceeb 50%, #ffd700 100%);
+    background: linear-gradient(135deg, #f0f8ff 0%, #e6f3ff 100%);
     color: #2c3e50;
     position: relative;
 }
@@ -229,16 +229,24 @@ body {
     justify-content: space-between;
     align-items: center;
     padding: 1rem 2rem;
-    background: rgba(255, 255, 255, 0.15);
+    background: rgba(255, 255, 255, 0.8);
     backdrop-filter: blur(20px);
-    border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+    border-bottom: 1px solid rgba(176, 196, 222, 0.3);
     height: 60px;
     box-sizing: border-box;
     flex-shrink: 0;
+    box-shadow: 0 2px 10px rgba(176, 196, 222, 0.1);
+}
+
+.header-left,
+.header-right {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
 }
 
 .back-button {
-    background: rgba(255, 107, 157, 0.8);
+    background: linear-gradient(135deg, #87ceeb 0%, #b0c4de 100%);
     border: 1px solid rgba(255, 255, 255, 0.5);
     color: white;
     padding: 0.5rem 1rem;
@@ -248,19 +256,20 @@ body {
     font-weight: 500;
     transition: all 0.3s ease;
     backdrop-filter: blur(10px);
+    box-shadow: 0 2px 8px rgba(135, 206, 235, 0.3);
 }
 
 .back-button:hover {
-    background: rgba(135, 206, 235, 0.8);
-    transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(135, 206, 235, 0.3);
+    background: linear-gradient(135deg, #b0c4de 0%, #87ceeb 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(135, 206, 235, 0.4);
 }
 
 .album-title {
     font-size: 1.8rem;
     margin: 0;
-    color: white;
-    font-weight: 600;
+    color: #00bfff;
+    font-weight: 800;
     text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
 }
 
@@ -324,12 +333,12 @@ body {
 
 .book-page {
     flex: 1;
-    background: rgba(255, 255, 255, 0.95);
+    background: #ffffe0;
     color: #2c3e50;
-    padding: 1.5rem;
+    padding: 2rem;
     border: none;
-    border-radius: 12px;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+    border-radius: 0;
+    box-shadow: inset 0 0 20px rgba(176, 196, 222, 0.1), 0 5px 15px rgba(0, 0, 0, 0.1);
     position: relative;
     overflow: visible;
     display: flex;
@@ -337,8 +346,11 @@ body {
     box-sizing: border-box;
     min-height: 0;
     z-index: 2;
-    margin: 0.5rem;
-    backdrop-filter: blur(20px);
+    margin: 0;
+    background-image: linear-gradient(rgba(176, 196, 222, 0.2) 1px, transparent 1px);
+    background-size: 20px 20px;
+    border-left: 1px solid rgba(176, 196, 222, 0.2);
+    border-right: 1px solid rgba(176, 196, 222, 0.2);
 }
 
 .left-page {
@@ -370,7 +382,7 @@ body {
 
 .page-number {
     font-size: 0.9rem;
-    color: rgba(255, 255, 255, 0.9);
+    color: rgba(167, 239, 255, 0.9);
     font-family: "Inter", sans-serif;
     font-weight: 500;
 }
@@ -389,8 +401,8 @@ body {
     font-size: 3rem;
     color: #2c3e50;
     margin: 0;
-    font-family: "Inter", sans-serif;
-    font-weight: 600;
+    font-family: cursive;
+    font-weight: 900;
     text-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
 }
 
@@ -475,6 +487,29 @@ body {
     background: linear-gradient(145deg, #87ceeb, #ffd700);
 }
 
+.export-html {
+    background: linear-gradient(145deg, #32cd32, #228b22);
+    color: white;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.8rem;
+    font-family: "Inter", sans-serif;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 8px rgba(50, 205, 50, 0.3);
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+}
+
+.export-html:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(50, 205, 50, 0.4);
+    background: linear-gradient(145deg, #228b22, #32cd32);
+}
+
 .empty-favorites {
     display: flex;
     flex-direction: column;
@@ -543,6 +578,11 @@ body {
         grid-template-columns: repeat(2, 1fr); /* 2x2 grid for 4 items max */
     }
 
+    .video-container {
+        width: 100%;
+        height: 100%;
+    }
+
     /* Adjust album width based on screen width */
     .book-spread {
         width: min(100%, 90vw);
@@ -557,6 +597,11 @@ body {
 
     .masonry-grid {
         grid-template-columns: repeat(2, 1fr); /* 2x2 grid for 4 items max */
+    }
+
+    .video-container {
+        width: 100%;
+        height: 100%;
     }
 
     .book-page {
@@ -579,6 +624,11 @@ body {
     .masonry-grid {
         grid-template-columns: repeat(2, 1fr); /* 2x2 grid for 4 items max */
         gap: 1rem;
+    }
+
+    .video-container {
+        width: 100%;
+        height: 100%;
     }
 }
 
@@ -612,8 +662,12 @@ body {
     padding: 12px;
     border: none;
     border-radius: 8px;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 4px 15px rgba(135, 206, 235, 0.2);
     position: relative;
+    width: fit-content;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
 
 .photo-container {
@@ -634,6 +688,11 @@ body {
 
 .video-container {
     position: relative;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    border-radius: 4px;
+    background: #ffffff;
 }
 
 .video-thumbnail {
@@ -702,17 +761,17 @@ body {
 }
 
 .star-button {
-    background: linear-gradient(45deg, #ff6b9d, #ffd700);
+    background: linear-gradient(135deg, #87ceeb 0%, #ffd700 100%);
     color: white;
     font-size: 1.1rem;
     border: none;
-    box-shadow: 0 2px 8px rgba(255, 107, 157, 0.3);
+    box-shadow: 0 2px 8px rgba(135, 206, 235, 0.3);
 }
 
 .star-button:hover {
-    background: linear-gradient(45deg, #87ceeb, #ff6b9d);
+    background: linear-gradient(135deg, #ffd700 0%, #87ceeb 100%);
     transform: scale(1.1);
-    box-shadow: 0 4px 12px rgba(255, 107, 157, 0.4);
+    box-shadow: 0 4px 12px rgba(135, 206, 235, 0.4);
 }
 
 .polaroid-caption {
@@ -802,7 +861,7 @@ body {
 }
 
 .nav-button {
-    background: linear-gradient(45deg, #ff6b9d, #87ceeb);
+    background: linear-gradient(135deg, #87ceeb 0%, #b0c4de 100%);
     color: white;
     border: 2px solid rgba(255, 255, 255, 0.8);
     width: 60px;
@@ -817,14 +876,14 @@ body {
     display: flex;
     align-items: center;
     justify-content: center;
-    box-shadow: 0 6px 20px rgba(255, 107, 157, 0.4);
+    box-shadow: 0 6px 20px rgba(135, 206, 235, 0.4);
     text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
 }
 
 .nav-button:hover:not(:disabled) {
-    background: linear-gradient(45deg, #87ceeb, #ffd700);
-    transform: scale(1.15);
-    box-shadow: 0 8px 25px rgba(255, 107, 157, 0.6);
+    background: linear-gradient(135deg, #b0c4de 0%, #87ceeb 100%);
+    transform: scale(1.1);
+    box-shadow: 0 8px 25px rgba(135, 206, 235, 0.6);
     border-color: rgba(255, 255, 255, 1);
 }
 
@@ -844,9 +903,8 @@ body {
     bottom: 0;
     background: linear-gradient(
         135deg,
-        rgba(255, 107, 157, 0.9) 0%,
-        rgba(135, 206, 235, 0.9) 50%,
-        rgba(255, 215, 0, 0.9) 100%
+        rgba(240, 248, 255, 0.95) 0%,
+        rgba(230, 243, 255, 0.95) 100%
     );
     backdrop-filter: blur(20px);
     display: flex;
@@ -857,25 +915,27 @@ body {
 }
 
 .photo-modal {
-    background: rgba(255, 255, 255, 0.95);
-    border-radius: 16px;
+    background: #ffffe0;
+    border-radius: 8px;
     max-width: 90vw;
     max-height: 90vh;
     overflow: hidden;
     position: relative;
     display: flex;
-    box-shadow: 0 20px 60px rgba(255, 107, 157, 0.3);
-    border: 2px solid rgba(255, 255, 255, 0.5);
-    backdrop-filter: blur(20px);
+    box-shadow: 0 20px 60px rgba(135, 206, 235, 0.3);
+    border: 1px solid rgba(176, 196, 222, 0.3);
+    background-image: linear-gradient(rgba(176, 196, 222, 0.05) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(176, 196, 222, 0.05) 1px, transparent 1px);
+    background-size: 20px 20px;
 }
 
 .modal-close {
     position: absolute;
     top: 1rem;
     right: 1rem;
-    background: linear-gradient(45deg, #ff6b9d, #87ceeb);
+    background: linear-gradient(135deg, #87ceeb 0%, #b0c4de 100%);
     color: white;
-    border: 2px solid rgba(255, 255, 255, 0.8);
+    border: 1px solid rgba(255, 255, 255, 0.8);
     width: 45px;
     height: 45px;
     border-radius: 50%;
@@ -887,13 +947,13 @@ body {
     display: flex;
     align-items: center;
     justify-content: center;
-    box-shadow: 0 4px 15px rgba(255, 107, 157, 0.3);
+    box-shadow: 0 4px 15px rgba(135, 206, 235, 0.3);
 }
 
 .modal-close:hover {
-    background: linear-gradient(45deg, #87ceeb, #ffd700);
+    background: linear-gradient(135deg, #b0c4de 0%, #87ceeb 100%);
     transform: scale(1.1);
-    box-shadow: 0 6px 20px rgba(255, 107, 157, 0.5);
+    box-shadow: 0 6px 20px rgba(135, 206, 235, 0.5);
 }
 
 .modal-content {
@@ -907,18 +967,18 @@ body {
     display: flex;
     align-items: center;
     justify-content: center;
-    background: linear-gradient(135deg, rgba(255, 107, 157, 0.1), rgba(135, 206, 235, 0.1));
+    background: rgba(255, 255, 224, 0.5);
     padding: 2rem;
-    border-radius: 16px 0 0 16px;
+    border-radius: 8px 0 0 8px;
 }
 
 .modal-image {
     max-width: 100%;
     max-height: 100%;
     object-fit: contain;
-    border-radius: 12px;
-    box-shadow: 0 10px 30px rgba(255, 107, 157, 0.2);
-    border: 3px solid rgba(255, 255, 255, 0.8);
+    border-radius: 8px;
+    box-shadow: 0 10px 30px rgba(135, 206, 235, 0.2);
+    border: 2px solid rgba(255, 255, 255, 0.8);
 }
 
 .modal-sidebar {
@@ -926,9 +986,9 @@ body {
     padding: 2rem;
     overflow-y: auto;
     min-width: 300px;
-    background: rgba(255, 255, 255, 0.9);
-    border-radius: 0 16px 16px 0;
-    backdrop-filter: blur(10px);
+    background: #ffffe0;
+    border-radius: 0 8px 8px 0;
+    border-left: 1px solid rgba(176, 196, 222, 0.2);
 }
 
 .photo-title {
@@ -936,10 +996,7 @@ body {
     color: #2c3e50;
     font-size: 1.5rem;
     font-weight: 600;
-    background: linear-gradient(45deg, #ff6b9d, #87ceeb);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
+    font-family: "Inter", sans-serif;
 }
 
 .detail-group {
@@ -958,7 +1015,7 @@ body {
 .detail-textarea {
     width: 100%;
     padding: 0.75rem;
-    border: 2px solid #ff6b9d;
+    border: 2px solid #87ceeb;
     border-radius: 8px;
     background: rgba(255, 255, 255, 0.9);
     font-family: "Inter", sans-serif;
@@ -968,18 +1025,18 @@ body {
 
 .detail-display {
     padding: 0.75rem;
-    background: linear-gradient(45deg, rgba(255, 107, 157, 0.1), rgba(135, 206, 235, 0.1));
+    background: rgba(135, 206, 235, 0.1);
     border-radius: 8px;
     font-family: "Inter", sans-serif;
     color: #2c3e50;
-    border: 2px solid rgba(255, 107, 157, 0.3);
+    border: 2px solid rgba(135, 206, 235, 0.3);
 }
 
 .detail-input:focus,
 .detail-textarea:focus {
     outline: none;
-    border-color: #87ceeb;
-    box-shadow: 0 0 10px rgba(135, 206, 235, 0.3);
+    border-color: #b0c4de;
+    box-shadow: 0 0 10px rgba(176, 196, 222, 0.3);
 }
 
 .character-count {
@@ -993,10 +1050,10 @@ body {
 .metadata {
     margin: 2rem 0;
     padding: 1rem;
-    background: linear-gradient(45deg, rgba(255, 215, 0, 0.1), rgba(135, 206, 235, 0.1));
-    border-radius: 12px;
-    border-left: 4px solid #ffd700;
-    border: 2px solid rgba(255, 215, 0, 0.3);
+    background: rgba(176, 196, 222, 0.1);
+    border-radius: 8px;
+    border-left: 4px solid #87ceeb;
+    border: 1px solid rgba(176, 196, 222, 0.3);
 }
 
 .metadata-item {
@@ -1019,7 +1076,7 @@ body {
 
 .save-changes-button {
     width: 100%;
-    background: linear-gradient(145deg, #ff6b9d, #87ceeb);
+    background: linear-gradient(135deg, #87ceeb 0%, #b0c4de 100%);
     color: white;
     border: none;
     padding: 1rem;
@@ -1029,12 +1086,13 @@ body {
     font-weight: 500;
     cursor: pointer;
     transition: all 0.3s ease;
+    box-shadow: 0 2px 8px rgba(135, 206, 235, 0.3);
 }
 
 .save-changes-button:hover {
     transform: translateY(-2px);
-    box-shadow: 0 4px 15px rgba(255, 107, 157, 0.3);
-    background: linear-gradient(145deg, #87ceeb, #ffd700);
+    box-shadow: 0 4px 15px rgba(135, 206, 235, 0.4);
+    background: linear-gradient(135deg, #b0c4de 0%, #87ceeb 100%);
 }
 
 /* Responsive Design */
@@ -1091,6 +1149,17 @@ body {
     .album-header {
         padding: 0.75rem 1rem;
         height: 50px;
+    }
+
+    .header-right {
+        flex-direction: column;
+        gap: 0.25rem;
+        align-items: flex-end;
+    }
+
+    .export-html {
+        font-size: 0.7rem;
+        padding: 0.375rem 0.75rem;
     }
 
     .photo-modal {
