@@ -42,14 +42,14 @@ const FavoritesPage: React.FC<FavoritesPageProps> = ({
           className="export-button export-pdf"
           title="Export favorites as PDF"
         >
-          📄 Export PDF
+          Export PDF
         </button>
         <button 
           onClick={handleExportJPEG}
           className="export-button export-jpeg"
           title="Export favorites as JPEG"
         >
-          🖼️ Export JPEG
+          Export JPEG
         </button>
       </div>
 

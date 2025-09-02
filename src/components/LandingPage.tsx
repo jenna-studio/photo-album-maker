@@ -65,7 +65,6 @@ const LandingPage: React.FC<LandingPageProps> = ({
                 id="landing-upload"
               />
               <label htmlFor="landing-upload" className="upload-button">
-                <span className="upload-icon">📁</span>
                 Add Photos & Videos to Begin
               </label>
             </div>
@@ -81,23 +80,6 @@ const LandingPage: React.FC<LandingPageProps> = ({
         </div>
       </div>
 
-      <div className="features-preview">
-        <div className="feature">
-          <div className="feature-icon">🗓️</div>
-          <h3>Organized by Date</h3>
-          <p>Photos automatically sorted by capture date</p>
-        </div>
-        <div className="feature">
-          <div className="feature-icon">🖼️</div>
-          <h3>Polaroid Style</h3>
-          <p>Authentic vintage photo album experience</p>
-        </div>
-        <div className="feature">
-          <div className="feature-icon">📱</div>
-          <h3>Responsive Design</h3>
-          <p>Beautiful on any device</p>
-        </div>
-      </div>
     </div>
   );
 };

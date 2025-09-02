@@ -5,7 +5,7 @@ export const createAlbumsFromPhotos = (photos: MediaItem[]): Album[] => {
   if (photos.length === 0) {
     return [{
       id: 'main-album',
-      name: 'My Photo Album',
+      name: '',
       photos: [],
       createdAt: new Date(),
       isOpen: false
@@ -14,7 +14,7 @@ export const createAlbumsFromPhotos = (photos: MediaItem[]): Album[] => {
 
   return [{
     id: 'main-album',
-    name: 'My Photo Album',
+    name: '',
     photos: photos.sort((a, b) => (a.capturedAt || a.uploadedAt).getTime() - (b.capturedAt || b.uploadedAt).getTime()),
     createdAt: new Date(),
     coverPhoto: photos[0],

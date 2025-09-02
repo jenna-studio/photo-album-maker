@@ -268,7 +268,7 @@ const AlbumBook: React.FC<AlbumBookProps> = ({
         <h1 className="album-title">{album.name}</h1>
         <div className="header-right">
           <button className="export-button export-html" onClick={handleHTMLExport} title="Export as offline HTML file">
-            📄 Export HTML
+            Export HTML
           </button>
           <div className="page-indicator">
             {isMobile 

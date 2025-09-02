@@ -26,6 +26,7 @@ const PhotoModal: React.FC<PhotoModalProps> = ({ photo, onClose, onUpdate }) => 
 
   const handleSave = () => {
     onUpdate({ description });
+    alert('Changes saved successfully!');
   };
 
   const formatDate = (date: Date) => {
