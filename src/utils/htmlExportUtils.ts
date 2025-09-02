@@ -187,6 +187,11 @@ export const createHTMLTemplate = (
                                 <div class="detail-display">\${selectedPhoto.location || 'No location available'}</div>
                             </div>
                             
+                            <div class="detail-group">
+                                <label>Description</label>
+                                <div class="detail-display">\${selectedPhoto.description || 'No description available'}</div>
+                            </div>
+                            
                             
                             <div class="metadata">
                                 <div class="metadata-item">

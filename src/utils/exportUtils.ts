@@ -228,7 +228,7 @@ export const exportFavoritesToPDF = async (favorites: Photo[], albumName: string
       const leftPhotos = spreadPhotos.slice(0, 4);
       const rightPhotos = spreadPhotos.slice(4, 8);
       
-      const spreadTitle = isFirstSpread ? `${albumName || 'Album'} - Favorites` : '';
+      const spreadTitle = ''; // No title on any spread
 
       // Create styled book spread
       const spreadContainer = await createBookSpread(leftPhotos, rightPhotos, spreadTitle);
@@ -304,7 +304,7 @@ export const exportFavoritesToJPEG = async (favorites: Photo[], albumName: strin
       const leftPhotos = spreadPhotos.slice(0, 4);
       const rightPhotos = spreadPhotos.slice(4, 8);
       
-      const spreadTitle = spreadNumber === 1 ? `${albumName || 'Album'} - Favorites` : '';
+      const spreadTitle = ''; // No title on any spread
 
       // Create styled book spread
       const spreadContainer = await createBookSpread(leftPhotos, rightPhotos, spreadTitle);
