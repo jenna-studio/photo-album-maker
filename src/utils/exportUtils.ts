@@ -3,35 +3,65 @@ import { jsPDF } from 'jspdf';
 import JSZip from 'jszip';
 import type { Photo } from '../types';
 
-// Page dimensions to match album styling
-const PAGE_WIDTH = 800;
-const PAGE_HEIGHT = 600;
-const PHOTOS_PER_PAGE = 4;
+// Landscape book dimensions (like A4 landscape but wider for book spread)
+const BOOK_SPREAD_WIDTH = 1600; // Full spread width (matches album)
+const BOOK_PAGE_WIDTH = 800;    // Single page width 
+const BOOK_PAGE_HEIGHT = 600;   // Page height
+const PHOTOS_PER_SPREAD = 6;    // 3 photos per page, 2 pages per spread
 
-const createStyledPolaroid = async (photo: Photo): Promise<HTMLElement> => {
+const calculateCaptionHeight = (photo: Photo, maxWidth: number): number => {
+  // Calculate height needed for caption based on content
+  const hasLocation = !!photo.location;
+  const hasDescription = !!photo.description;
+  
+  if (!hasLocation && !hasDescription) {
+    return 25; // Default height for "✨ Favorite Memory"
+  }
+
+  let estimatedLines = 0;
+  const charPerLine = Math.floor(maxWidth / 8); // Rough estimate based on font size
+
+  if (hasLocation) {
+    estimatedLines += Math.ceil((photo.location?.length || 0 + 2) / charPerLine); // +2 for icon
+  }
+  
+  if (hasDescription) {
+    estimatedLines += Math.ceil((photo.description?.length || 0) / charPerLine);
+  }
+
+  // Add some padding between lines and ensure minimum height
+  return Math.max(25, estimatedLines * 16 + 10);
+};
+
+const createStyledPolaroid = async (photo: Photo, maxWidth: number = 220): Promise<HTMLElement> => {
+  // Calculate dynamic caption height
+  const captionHeight = calculateCaptionHeight(photo, maxWidth);
+
   // Create polaroid container with album styling
   const polaroidContainer = document.createElement('div');
   polaroidContainer.className = 'polaroid-photo medium';
   polaroidContainer.style.cssText = `
     position: relative;
     cursor: default;
-    margin: 0.25rem;
+    margin: 0.5rem;
     width: fit-content;
+    max-width: ${maxWidth}px;
     box-sizing: border-box;
-    transform: rotate(${(Math.random() - 0.5) * 8}deg);
+    transform: rotate(${(Math.random() - 0.5) * 6}deg);
   `;
 
-  // Create polaroid frame
+  // Create polaroid frame with dynamic height
   const frame = document.createElement('div');
   frame.className = 'polaroid-frame';
   frame.style.cssText = `
     background: white;
-    padding: 12px;
+    padding: 12px 12px ${captionHeight + 12}px 12px;
     border: none;
     border-radius: 8px;
     box-shadow: 0 4px 15px rgba(135, 206, 235, 0.2);
     position: relative;
     width: fit-content;
+    max-width: ${maxWidth}px;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -44,6 +74,7 @@ const createStyledPolaroid = async (photo: Photo): Promise<HTMLElement> => {
     position: relative;
     overflow: hidden;
     border-radius: 1px;
+    width: 100%;
   `;
 
   // Create image element
@@ -52,7 +83,7 @@ const createStyledPolaroid = async (photo: Photo): Promise<HTMLElement> => {
   img.className = 'photo-image';
   img.style.cssText = `
     width: 100%;
-    height: 200px;
+    height: 160px;
     object-fit: cover;
     display: block;
     background: #f8f8f8;
@@ -73,13 +104,16 @@ const createStyledPolaroid = async (photo: Photo): Promise<HTMLElement> => {
   const caption = document.createElement('div');
   caption.className = 'polaroid-caption';
   caption.style.cssText = `
-    margin-top: 10px;
-    height: auto;
-    min-height: 25px;
+    position: absolute;
+    bottom: 12px;
+    left: 12px;
+    right: 12px;
+    height: ${captionHeight}px;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
+    overflow: hidden;
   `;
 
   const captionContent = document.createElement('div');
@@ -87,23 +121,26 @@ const createStyledPolaroid = async (photo: Photo): Promise<HTMLElement> => {
   captionContent.style.cssText = `
     text-align: center;
     font-family: "Courier New", monospace;
-    font-size: 0.8rem;
+    font-size: 0.75rem;
     color: #333;
     width: 100%;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    line-height: 1.3;
   `;
 
-  let captionText = '';
+  let captionHTML = '';
   if (photo.location) {
-    captionText += `📍 ${photo.location}\n`;
+    captionHTML += `<div style="font-weight: bold; margin-bottom: 2px;">📍 ${photo.location}</div>`;
   }
   if (photo.description) {
-    captionText += photo.description;
+    captionHTML += `<div style="font-style: italic;">${photo.description}</div>`;
   }
   if (!photo.location && !photo.description) {
-    captionText = '✨ Favorite Memory';
+    captionHTML = '<div>✨ Favorite Memory</div>';
   }
 
-  captionContent.innerText = captionText;
+  captionContent.innerHTML = captionHTML;
   caption.appendChild(captionContent);
   frame.appendChild(caption);
   polaroidContainer.appendChild(frame);
@@ -111,33 +148,72 @@ const createStyledPolaroid = async (photo: Photo): Promise<HTMLElement> => {
   return polaroidContainer;
 };
 
-const createStyledPage = async (photos: Photo[], pageTitle: string): Promise<HTMLElement> => {
-  // Create page container with album styling
-  const pageContainer = document.createElement('div');
-  pageContainer.style.cssText = `
-    width: ${PAGE_WIDTH}px;
-    height: ${PAGE_HEIGHT}px;
+const createBookSpread = async (leftPhotos: Photo[], rightPhotos: Photo[], spreadTitle: string): Promise<HTMLElement> => {
+  // Create book spread container (landscape)
+  const spreadContainer = document.createElement('div');
+  spreadContainer.style.cssText = `
+    width: ${BOOK_SPREAD_WIDTH}px;
+    height: ${BOOK_PAGE_HEIGHT}px;
     background: #ffffe0;
     color: #2c3e50;
-    padding: 2rem;
-    border: none;
-    border-radius: 8px;
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
     position: relative;
     display: flex;
-    flex-direction: column;
     box-sizing: border-box;
     font-family: "Inter", sans-serif;
-    background-image: linear-gradient(rgba(176, 196, 222, 0.2) 1px, transparent 1px);
-    background-size: 20px 20px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    overflow: hidden;
   `;
 
-  // Add page header if it's the first page
-  if (pageTitle) {
+  // Create left page
+  const leftPage = document.createElement('div');
+  leftPage.style.cssText = `
+    width: ${BOOK_PAGE_WIDTH}px;
+    height: ${BOOK_PAGE_HEIGHT}px;
+    background: #ffffe0;
+    background-image: linear-gradient(rgba(176, 196, 222, 0.2) 1px, transparent 1px);
+    background-size: 20px 20px;
+    padding: 2rem;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    border-right: 1px solid rgba(176, 196, 222, 0.3);
+    position: relative;
+  `;
+
+  // Create right page
+  const rightPage = document.createElement('div');
+  rightPage.style.cssText = `
+    width: ${BOOK_PAGE_WIDTH}px;
+    height: ${BOOK_PAGE_HEIGHT}px;
+    background: #ffffe0;
+    background-image: linear-gradient(rgba(176, 196, 222, 0.2) 1px, transparent 1px);
+    background-size: 20px 20px;
+    padding: 2rem;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+  `;
+
+  // Add book spine shadow
+  const spine = document.createElement('div');
+  spine.style.cssText = `
+    position: absolute;
+    top: 0;
+    left: ${BOOK_PAGE_WIDTH}px;
+    width: 1px;
+    height: 100%;
+    background: linear-gradient(to bottom, rgba(0,0,0,0.1) 0%, rgba(0,0,0,0.2) 50%, rgba(0,0,0,0.1) 100%);
+    z-index: 10;
+  `;
+
+  // Add title to left page if it's the first spread
+  if (spreadTitle) {
     const header = document.createElement('div');
     header.style.cssText = `
       display: flex;
-      justify-content: space-between;
+      justify-content: center;
       align-items: center;
       margin-bottom: 1.5rem;
       border-bottom: 1px solid rgba(176, 196, 222, 0.2);
@@ -145,44 +221,60 @@ const createStyledPage = async (photos: Photo[], pageTitle: string): Promise<HTM
     `;
 
     const title = document.createElement('h1');
-    title.textContent = pageTitle;
+    title.textContent = spreadTitle;
     title.style.cssText = `
-      font-size: 1.8rem;
+      font-size: 1.5rem;
       color: #2c3e50;
       margin: 0;
       font-family: "Inter", sans-serif;
       font-weight: 600;
+      text-align: center;
     `;
 
     header.appendChild(title);
-    pageContainer.appendChild(header);
+    leftPage.appendChild(header);
   }
 
-  // Create photos grid
-  const grid = document.createElement('div');
-  grid.className = 'photos-grid masonry-grid';
-  grid.style.cssText = `
-    display: grid;
-    gap: 1rem;
-    justify-items: center;
-    align-items: center;
-    grid-template-columns: repeat(2, 1fr);
-    grid-template-rows: repeat(2, 1fr);
-    justify-content: space-evenly;
-    align-content: center;
-    flex: 1;
-    width: 100%;
-    padding: 1rem;
-  `;
+  // Create photo grids for both pages
+  const createPhotoGrid = () => {
+    const grid = document.createElement('div');
+    grid.style.cssText = `
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      justify-content: center;
+      align-items: center;
+      flex: 1;
+      width: 100%;
+      padding: 0.5rem;
+    `;
 
-  // Add photos to grid
-  for (const photo of photos) {
-    const polaroidElement = await createStyledPolaroid(photo);
-    grid.appendChild(polaroidElement);
+    return grid;
+  };
+
+  const leftGrid = createPhotoGrid();
+  const rightGrid = createPhotoGrid();
+
+  // Add photos to left page (max 3)
+  for (let i = 0; i < Math.min(leftPhotos.length, 3); i++) {
+    const polaroidElement = await createStyledPolaroid(leftPhotos[i], 200);
+    leftGrid.appendChild(polaroidElement);
   }
 
-  pageContainer.appendChild(grid);
-  return pageContainer;
+  // Add photos to right page (max 3)  
+  for (let i = 0; i < Math.min(rightPhotos.length, 3); i++) {
+    const polaroidElement = await createStyledPolaroid(rightPhotos[i], 200);
+    rightGrid.appendChild(polaroidElement);
+  }
+
+  leftPage.appendChild(leftGrid);
+  rightPage.appendChild(rightGrid);
+
+  spreadContainer.appendChild(leftPage);
+  spreadContainer.appendChild(spine);
+  spreadContainer.appendChild(rightPage);
+
+  return spreadContainer;
 };
 
 export const exportFavoritesToPDF = async (favorites: Photo[], albumName: string): Promise<void> => {
@@ -194,26 +286,29 @@ export const exportFavoritesToPDF = async (favorites: Photo[], albumName: string
       return;
     }
 
-    // Create PDF with multiple pages
-    const pdf = new jsPDF('landscape', 'pt', [PAGE_WIDTH, PAGE_HEIGHT]);
-    let isFirstPage = true;
+    // Create PDF in landscape format
+    const pdf = new jsPDF('landscape', 'pt', [BOOK_SPREAD_WIDTH, BOOK_PAGE_HEIGHT]);
+    let isFirstSpread = true;
 
-    // Process photos in groups of 4 (PHOTOS_PER_PAGE)
-    for (let i = 0; i < favorites.length; i += PHOTOS_PER_PAGE) {
-      const pagePhotos = favorites.slice(i, i + PHOTOS_PER_PAGE);
-      const pageTitle = isFirstPage ? `${albumName || 'Album'} - Favorites` : '';
+    // Process photos in groups of 6 (3 per page, 2 pages per spread)
+    for (let i = 0; i < favorites.length; i += PHOTOS_PER_SPREAD) {
+      const spreadPhotos = favorites.slice(i, i + PHOTOS_PER_SPREAD);
+      const leftPhotos = spreadPhotos.slice(0, 3);
+      const rightPhotos = spreadPhotos.slice(3, 6);
+      
+      const spreadTitle = isFirstSpread ? `${albumName || 'Album'} - Favorites` : '';
 
-      // Create styled page
-      const pageContainer = await createStyledPage(pagePhotos, pageTitle);
+      // Create styled book spread
+      const spreadContainer = await createBookSpread(leftPhotos, rightPhotos, spreadTitle);
       
       // Add to DOM temporarily for rendering
-      pageContainer.style.position = 'absolute';
-      pageContainer.style.top = '-9999px';
-      pageContainer.style.left = '-9999px';
-      document.body.appendChild(pageContainer);
+      spreadContainer.style.position = 'absolute';
+      spreadContainer.style.top = '-9999px';
+      spreadContainer.style.left = '-9999px';
+      document.body.appendChild(spreadContainer);
 
       // Wait for images to load
-      const images = pageContainer.querySelectorAll('img');
+      const images = spreadContainer.querySelectorAll('img');
       await Promise.all(Array.from(images).map(img => {
         return new Promise((resolve) => {
           if (img.complete) {
@@ -225,25 +320,25 @@ export const exportFavoritesToPDF = async (favorites: Photo[], albumName: string
         });
       }));
 
-      // Generate canvas from page
-      const canvas = await html2canvas(pageContainer, {
-        width: PAGE_WIDTH,
-        height: PAGE_HEIGHT,
+      // Generate canvas from spread
+      const canvas = await html2canvas(spreadContainer, {
+        width: BOOK_SPREAD_WIDTH,
+        height: BOOK_PAGE_HEIGHT,
         useCORS: true,
         background: '#ffffe0'
       });
 
-      // Add page to PDF
-      if (!isFirstPage) {
+      // Add spread to PDF
+      if (!isFirstSpread) {
         pdf.addPage();
       }
 
       const imgData = canvas.toDataURL('image/jpeg', 0.9);
-      pdf.addImage(imgData, 'JPEG', 0, 0, PAGE_WIDTH, PAGE_HEIGHT);
+      pdf.addImage(imgData, 'JPEG', 0, 0, BOOK_SPREAD_WIDTH, BOOK_PAGE_HEIGHT);
 
       // Clean up
-      document.body.removeChild(pageContainer);
-      isFirstPage = false;
+      document.body.removeChild(spreadContainer);
+      isFirstSpread = false;
     }
 
     // Save PDF
@@ -267,26 +362,29 @@ export const exportFavoritesToJPEG = async (favorites: Photo[], albumName: strin
       return;
     }
 
-    // Create ZIP file for multiple pages
+    // Create ZIP file for multiple spreads
     const zip = new JSZip();
-    let pageNumber = 1;
+    let spreadNumber = 1;
 
-    // Process photos in groups of 4 (PHOTOS_PER_PAGE)
-    for (let i = 0; i < favorites.length; i += PHOTOS_PER_PAGE) {
-      const pagePhotos = favorites.slice(i, i + PHOTOS_PER_PAGE);
-      const pageTitle = pageNumber === 1 ? `${albumName || 'Album'} - Favorites` : '';
+    // Process photos in groups of 6 (3 per page, 2 pages per spread)
+    for (let i = 0; i < favorites.length; i += PHOTOS_PER_SPREAD) {
+      const spreadPhotos = favorites.slice(i, i + PHOTOS_PER_SPREAD);
+      const leftPhotos = spreadPhotos.slice(0, 3);
+      const rightPhotos = spreadPhotos.slice(3, 6);
+      
+      const spreadTitle = spreadNumber === 1 ? `${albumName || 'Album'} - Favorites` : '';
 
-      // Create styled page
-      const pageContainer = await createStyledPage(pagePhotos, pageTitle);
+      // Create styled book spread
+      const spreadContainer = await createBookSpread(leftPhotos, rightPhotos, spreadTitle);
       
       // Add to DOM temporarily for rendering
-      pageContainer.style.position = 'absolute';
-      pageContainer.style.top = '-9999px';
-      pageContainer.style.left = '-9999px';
-      document.body.appendChild(pageContainer);
+      spreadContainer.style.position = 'absolute';
+      spreadContainer.style.top = '-9999px';
+      spreadContainer.style.left = '-9999px';
+      document.body.appendChild(spreadContainer);
 
       // Wait for images to load
-      const images = pageContainer.querySelectorAll('img');
+      const images = spreadContainer.querySelectorAll('img');
       await Promise.all(Array.from(images).map(img => {
         return new Promise((resolve) => {
           if (img.complete) {
@@ -298,10 +396,10 @@ export const exportFavoritesToJPEG = async (favorites: Photo[], albumName: strin
         });
       }));
 
-      // Generate canvas from page
-      const canvas = await html2canvas(pageContainer, {
-        width: PAGE_WIDTH,
-        height: PAGE_HEIGHT,
+      // Generate canvas from spread
+      const canvas = await html2canvas(spreadContainer, {
+        width: BOOK_SPREAD_WIDTH,
+        height: BOOK_PAGE_HEIGHT,
         useCORS: true,
         background: '#ffffe0'
       });
@@ -314,19 +412,19 @@ export const exportFavoritesToJPEG = async (favorites: Photo[], albumName: strin
       });
 
       // Add to ZIP
-      const filename = `page-${pageNumber.toString().padStart(2, '0')}.jpg`;
+      const filename = `spread-${spreadNumber.toString().padStart(2, '0')}.jpg`;
       zip.file(filename, imageBlob);
 
       // Clean up
-      document.body.removeChild(pageContainer);
-      pageNumber++;
+      document.body.removeChild(spreadContainer);
+      spreadNumber++;
     }
 
     // Generate and download ZIP file
     const zipBlob = await zip.generateAsync({ type: 'blob' });
     const link = document.createElement('a');
     link.href = URL.createObjectURL(zipBlob);
-    link.download = `${albumName || 'Album'}-favorites-pages.zip`;
+    link.download = `${albumName || 'Album'}-favorites-spreads.zip`;
     link.click();
 
     // Clean up
