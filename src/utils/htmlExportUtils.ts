@@ -433,7 +433,7 @@ export const exportAlbumToHTML = async (album: Album, pages: AlbumPage[]): Promi
                 // Keep original URLs for reference but they won't be used in offline mode
                 originalUrl: photo.url,
                 // Ensure metadata is preserved
-                fileSize: photo.fileSize || 0,
+                fileSize: photo.size || 0,
                 capturedAt: photo.capturedAt || photo.uploadedAt
               };
             } catch (error) {
@@ -441,7 +441,9 @@ export const exportAlbumToHTML = async (album: Album, pages: AlbumPage[]): Promi
               return {
                 ...photo,
                 dataUrl: photo.url, // Fallback to original URL
-                originalUrl: photo.url
+                originalUrl: photo.url,
+                fileSize: photo.size || 0,
+                capturedAt: photo.capturedAt || photo.uploadedAt
               };
             }
           })
